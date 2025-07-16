@@ -9,13 +9,15 @@ y = np.array(df['MedHouseVal'].values)
 
 class MLR:
     def __init__(self, x, y, a=0.01):
-        self.x = x
+        self.x = x.copy()
         self.y = y
         self.m, self.n = x.shape  # m = number of samples, n = number of features
         self.w = np.ones(self.n)
-        self.b = 1
+        self.b = 0
         self.a = a
         self.j = float('inf')  # initial cost set as infinity
+        self.mean = None
+        self.sd = None
 
     def cost_function(self):
         predictions = np.dot(self.x, self.w) + self.b
@@ -45,33 +47,11 @@ class MLR:
         print(f"Training completed in {count} iterations.")
 
     def normalize(self):
-        s = [0] * self.n
-        s1 = [0] * self.n
-        mean = [0] * self.n
-        sd = [0] * self.n
-
-        for row in self.x:
-            for i, val in enumerate(row):
-                s[i] += val
-
-        # Compute mean for each feature
-        for i in range(self.n):
-            mean[i] = s[i] / self.m
-
-        # Compute standard deviation for each feature
-        for row in self.x:
-            for i, val in enumerate(row):
-                s1[i] += (val - mean[i]) ** 2
-
-        for i in range(self.n):
-            sd[i] = (s1[i] / self.m) ** 0.5
-
-        for row in self.x:
-            for i in range(self.n):
-                if sd[i] != 0:
-                    row[i] = (row[i] - mean[i]) / sd[i]
-                else:
-                    row[i] = 0
+        self.mean = np.mean(self.x, axis=0)
+        self.sd = np.std(self.x, axis=0)
+        # Avoid division by zero
+        self.sd[self.sd == 0] = 1
+        self.x = (self.x - self.mean) / self.sd
 
 
 mlr = MLR(x, y)
