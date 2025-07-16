@@ -40,8 +40,8 @@ class MLR:
             self.j = self.cost_function()
             self.update_parameters()
             count += 1
-            #if count % 100 == 0 or count == 1:
-            print(f"Iter {count}: cost = {self.j:.6f}, b = {self.b:.4f}, w[0] = {self.w[0]:.4f}")
+            if count % 100 == 0 or count == 1:
+                print(f"Iter {count}: cost = {self.j:.6f}, b = {self.b:.4f}, w[0] = {self.w[0]:.4f}")
         print(f"Training completed in {count} iterations.")
 
     def normalize(self):
