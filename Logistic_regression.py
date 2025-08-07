@@ -13,13 +13,14 @@ x = np.array(df.drop(columns=['target']).values)
 y = np.array(df['target'].values)
 
 class Logistic_Regression:
-    def __init__(self, x, y, a = 0.01):
+    def __init__(self, x, y, a = 0.01, l = 1000):
         self.x = x.copy()
         self.y = y
         self.m, self.n = x.shape
-        self.w = np.ones(self.n)
+        self.w = np.zeros(self.n)
         self.b = 0
         self.a = a
+        self.l = l
         self.j = float('inf')
         self.mean = None
         self.sd = None
@@ -29,7 +30,7 @@ class Logistic_Regression:
         weighted_sum = np.dot(self.x, self.w) + self.b
         predictions = 1 / (1 + np.exp(-weighted_sum))
         predictions = np.clip(predictions, epsilon, 1 - epsilon)
-        cost = (-1/self.m) * np.sum((self.y * np.log(predictions)) + ((1 - self.y) * (np.log(1 - predictions))))
+        cost = (-1/self.m) * np.sum((self.y * np.log(predictions)) + (1 - self.y) * (np.log(1 - predictions))) + ((self.l / (2 * self.m)) * np.sum(self.w ** 2))
         return cost
 
     def update_parameters(self):
@@ -37,7 +38,7 @@ class Logistic_Regression:
         predictions = 1 / (1 + np.exp(-weighted_sum))
         errors = predictions - self.y
 
-        dw = (1 / self.m) * np.dot(self.x.T, errors)
+        dw = (1 / self.m) * (np.dot(self.x.T, errors)) + ((self.l/self.m) * self.w)
         db = (1 / self.m) * np.sum(errors)
 
         self.w -= self.a * dw
@@ -56,8 +57,9 @@ class Logistic_Regression:
             self.j = self.cost_function()
             self.update_parameters()
             count +=1
-            print (f"Iter {count}: cost = {self.j:.6f}, b = {self.b: .4f}, w[0] = {self.w[0]: .4f}")
+            print (f"Iter {count}: cost = {self.j: .6f}, b = {self.b: .4f}, w[0] = {self.w[0]: .4f}")
         print(f"Training completed in {count} iterations.")
 
 lr = Logistic_Regression(x, y)
 lr.run()
+
